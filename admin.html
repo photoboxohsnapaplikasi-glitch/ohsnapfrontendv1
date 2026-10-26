@@ -410,25 +410,27 @@
             return formattedTime ? `${formattedDate} ${formattedTime}` : formattedDate;
         }
 
-        function compressImage(file, maxWidth = 800, quality = 0.8) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const img = new Image();
-                    img.onload = () => {
-                        let w = img.width, h = img.height;
-                        if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
-                        const canvas = document.createElement('canvas');
-                        canvas.width = w; canvas.height = h;
-                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                    img.onerror = reject;
-                    img.src = e.target.result;
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
+        // FUNGSI UMUM UPLOAD FILE GAMBAR KE SUPABASE STORAGE
+        async function uploadFileToSupabase(file, folderPrefix) {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${folderPrefix}-${Date.now()}.${fileExt}`;
+            const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${BUCKET_NAME}/${fileName}`;
+
+            const uploadResponse = await fetch(uploadUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Content-Type': file.type
+                },
+                body: file
             });
+
+            if (!uploadResponse.ok) {
+                throw new Error('Gagal mengunggah file ke Supabase Storage.');
+            }
+
+            return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/${fileName}`;
         }
 
         async function saveCMS(entriesObj, btnId) {
@@ -533,29 +535,73 @@
         // ===================================================================
 
         async function saveStudioBox(num) {
-            const updates = {};
-            const t = document.getElementById('studioTitle' + num).value;
-            updates['studioTitle' + num] = t; 
-            const file = document.getElementById('studioFile' + num).files[0];
-            if (file) updates['studioImg' + num] = await compressImage(file);
-            await saveCMS(updates, 'btnStudio' + num);
+            const btn = document.getElementById('btnStudio' + num);
+            try {
+                btn.disabled = true;
+                btn.innerText = "⏳ Upload...";
+                const updates = {};
+                updates['studioTitle' + num] = document.getElementById('studioTitle' + num).value;
+                
+                const file = document.getElementById('studioFile' + num).files[0];
+                if (file) {
+                    updates['studioImg' + num] = await uploadFileToSupabase(file, `studio-${num}`);
+                }
+                
+                await saveCMS(updates, null);
+            } catch (err) {
+                console.error(err);
+                alert('❌ Gagal mengunggah foto studio.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Simpan " + num;
+            }
         }
 
         async function saveBanner() {
-            const updates = {};
-            updates.heroTitle = document.getElementById('headTitleInput').value;
-            const file = document.getElementById('bannerFile').files[0];
-            if (file) updates.heroBannerImg = await compressImage(file, 1200, 0.8);
-            await saveCMS(updates, 'btnSaveBanner');
+            const btn = document.getElementById('btnSaveBanner');
+            try {
+                btn.disabled = true;
+                btn.innerText = "⏳ Upload...";
+                const updates = {};
+                updates.heroTitle = document.getElementById('headTitleInput').value;
+                
+                const file = document.getElementById('bannerFile').files[0];
+                if (file) {
+                    updates.heroBannerImg = await uploadFileToSupabase(file, 'banner-hero');
+                }
+                
+                await saveCMS(updates, null);
+            } catch (err) {
+                console.error(err);
+                alert('❌ Gagal mengunggah banner.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Simpan Banner & Headline";
+            }
         }
 
         async function saveAbout() {
-            const updates = {};
-            updates.aboutTitle = document.getElementById('aboutTitleInput').value;
-            updates.aboutDesc = document.getElementById('aboutDescInput').value;
-            const file = document.getElementById('aboutFile').files[0];
-            if (file) updates.aboutStoryImg = await compressImage(file);
-            await saveCMS(updates, 'btnSaveAbout');
+            const btn = document.getElementById('btnSaveAbout');
+            try {
+                btn.disabled = true;
+                btn.innerText = "⏳ Upload...";
+                const updates = {};
+                updates.aboutTitle = document.getElementById('aboutTitleInput').value;
+                updates.aboutDesc = document.getElementById('aboutDescInput').value;
+                
+                const file = document.getElementById('aboutFile').files[0];
+                if (file) {
+                    updates.aboutStoryImg = await uploadFileToSupabase(file, 'about-story');
+                }
+                
+                await saveCMS(updates, null);
+            } catch (err) {
+                console.error(err);
+                alert('❌ Gagal mengunggah foto about.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Simpan About Story";
+            }
         }
 
         // FUNGSI UPLOAD VIDEO KE SUPABASE STORAGE
@@ -569,25 +615,7 @@
                 btn.disabled = true;
                 btn.innerText = "⏳ Upload...";
 
-                const fileExt = file.name.split('.').pop();
-                const fileName = `video-feed-${num}-${Date.now()}.${fileExt}`;
-                const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${BUCKET_NAME}/${fileName}`;
-
-                const uploadResponse = await fetch(uploadUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Content-Type': file.type
-                    },
-                    body: file
-                });
-
-                if (!uploadResponse.ok) {
-                    throw new Error('Gagal mengunggah video ke Supabase Storage.');
-                }
-
-                const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET_NAME}/${fileName}`;
+                const publicUrl = await uploadFileToSupabase(file, `video-feed-${num}`);
 
                 const updates = {};
                 updates['videoFeed' + num] = publicUrl;
@@ -616,21 +644,51 @@
         }
 
         async function savePromoBox(num) {
-            const updates = {};
-            updates['promoTitle' + num] = document.getElementById('promoTitle' + num).value;
-            updates['promoDesc' + num] = document.getElementById('promoDesc' + num).value;
-            const file = document.getElementById('promoFile' + num).files[0];
-            if (file) updates['promoImg' + num] = await compressImage(file);
-            await saveCMS(updates, 'btnPromo' + num);
+            const btn = document.getElementById('btnPromo' + num);
+            try {
+                btn.disabled = true;
+                btn.innerText = "⏳ Upload...";
+                const updates = {};
+                updates['promoTitle' + num] = document.getElementById('promoTitle' + num).value;
+                updates['promoDesc' + num] = document.getElementById('promoDesc' + num).value;
+                
+                const file = document.getElementById('promoFile' + num).files[0];
+                if (file) {
+                    updates['promoImg' + num] = await uploadFileToSupabase(file, `promo-${num}`);
+                }
+                
+                await saveCMS(updates, null);
+            } catch (err) {
+                console.error(err);
+                alert('❌ Gagal mengunggah foto promo.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Simpan " + num;
+            }
         }
 
         async function saveFrameBox(num) {
-            const updates = {};
-            updates['frameTitle' + num] = document.getElementById('frameTitle' + num).value;
-            updates['frameDesc' + num] = document.getElementById('frameDesc' + num).value;
-            const file = document.getElementById('frameFile' + num).files[0];
-            if (file) updates['frameImg' + num] = await compressImage(file);
-            await saveCMS(updates, 'btnFrame' + num);
+            const btn = document.getElementById('btnFrame' + num);
+            try {
+                btn.disabled = true;
+                btn.innerText = "⏳ Upload...";
+                const updates = {};
+                updates['frameTitle' + num] = document.getElementById('frameTitle' + num).value;
+                updates['frameDesc' + num] = document.getElementById('frameDesc' + num).value;
+                
+                const file = document.getElementById('frameFile' + num).files[0];
+                if (file) {
+                    updates['frameImg' + num] = await uploadFileToSupabase(file, `frame-${num}`);
+                }
+                
+                await saveCMS(updates, null);
+            } catch (err) {
+                console.error(err);
+                alert('❌ Gagal mengunggah foto frame.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Simpan " + num;
+            }
         }
 
         async function loadAllData() {
