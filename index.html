@@ -217,9 +217,11 @@
         }
         @media screen and (max-width: 768px) {
             .menu-toggle { display: flex; }
-            .nav-menu { position: fixed; top: 0; left: -100%; width: 260px; height: 100vh; background-color: #ffffff; flex-direction: column; padding: 90px 25px 25px 25px; box-shadow: 5px 0 25px rgba(0,0,0,0.1); transition: left 0.3s ease-in-out; border-right: 1px solid #fbcfe8; gap: 0; margin: 0; }
+            /* Perubahan background slide hamburger menjadi pink (#ef4444) dan teks menu putih */
+            .nav-menu { position: fixed; top: 0; left: -100%; width: 260px; height: 100vh; background-color: #ef4444; flex-direction: column; padding: 90px 25px 25px 25px; box-shadow: 5px 0 25px rgba(0,0,0,0.1); transition: left 0.3s ease-in-out; border-right: 1px solid #dc2626; gap: 0; margin: 0; }
             .nav-menu.active { left: 0; }
-            .nav-menu a { margin-left: 0; font-size: 1.05rem; padding: 14px 0; border-bottom: 1px solid #f3f4f6; width: 100%; color: #2b4c7e; opacity: 1; }
+            .nav-menu a { margin-left: 0; font-size: 1.05rem; padding: 14px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); width: 100%; color: #ffffff; opacity: 0.9; }
+            .nav-menu a:hover, .nav-menu a.active { opacity: 1; font-weight: 700; color: #ffffff; }
             
             .hero-banner { flex-direction: column; justify-content: center; text-align: center; min-height: 350px; height: auto; padding: 60px 5%; gap: 30px; }
             .hero-content { margin-left: 0; }
@@ -384,7 +386,6 @@
 
         async function loadHomepageContent() {
             try {
-                // Parameter ?t=... mencegah cache browser agar data update langsung tampil
                 const response = await fetch(APPS_SCRIPT_URL + "?t=" + new Date().getTime());
                 if (!response.ok) return;
 
@@ -393,29 +394,24 @@
                 if (data && data.homepage) {
                     const c = data.homepage;
 
-                    // 1. Hero & Banner
                     if (c.heroTitle) document.getElementById('heroTitleText').innerHTML = c.heroTitle;
                     if (c.heroBannerImg) document.getElementById('heroBannerSection').style.backgroundImage = `url('${c.heroBannerImg}')`;
 
-                    // 2. About Our Story
                     if (c.aboutTitle) document.getElementById('aboutTitleText').textContent = c.aboutTitle;
                     if (c.aboutDesc) document.getElementById('aboutDescText').textContent = c.aboutDesc;
                     if (c.aboutStoryImg) document.getElementById('aboutStoryImgEl').src = c.aboutStoryImg;
 
-                    // 3. Suasana Studio (4 Kolom)
                     for (let i = 1; i <= 4; i++) {
                         if (c['studioTitle' + i]) document.getElementById('studioTitleEl' + i).textContent = c['studioTitle' + i];
                         if (c['studioImg' + i]) document.getElementById('studioImgEl' + i).src = c['studioImg' + i];
                     }
 
-                    // 4. Promo (3 Kolom)
                     for (let i = 1; i <= 3; i++) {
                         if (c['promoTitle' + i]) document.getElementById('promoTitleEl' + i).textContent = c['promoTitle' + i];
                         if (c['promoDesc' + i]) document.getElementById('promoDescEl' + i).textContent = c['promoDesc' + i];
                         if (c['promoImg' + i]) document.getElementById('promoImgEl' + i).src = c['promoImg' + i];
                     }
 
-                    // 5. Video Feed (Tanpa autoplay agar bisa diklik manual & suara aktif)
                     for (let i = 1; i <= 5; i++) {
                         const videoEl = document.getElementById('videoFeedEl' + i);
                         if (videoEl && c['videoFeed' + i]) {
@@ -428,7 +424,23 @@
             }
         }
 
-        document.addEventListener("DOMContentLoaded", loadHomepageContent);
+        // Skrip untuk memastikan hanya 1 video yang menyala (otomatis pause video lain)
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHomepageContent();
+
+            setTimeout(() => {
+                const allVideos = document.querySelectorAll('video');
+                allVideos.forEach(video => {
+                    video.addEventListener('play', () => {
+                        allVideos.forEach(v => {
+                            if (v !== video) {
+                                v.pause();
+                            }
+                        });
+                    });
+                });
+            }, 1000); // Diberi jeda agar elemen video dari dynamic load siap
+        });
     </script>
 </body>
 </html>
