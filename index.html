@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OH SNAP! - Modern Photobox & Self-Photo Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        body { 
+            background: linear-gradient(135deg, #fff0f5 0%, #ffe4e6 50%, #fdf2f8 100%); 
+            color: #2b4c7e; 
+            line-height: 1.6; 
+        }
+        
+        /* HEADER KONSISTEN */
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            height: 85px; 
+            padding: 0 4%; 
+            background: #ff1493; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .logo-container { display: flex; align-items: center; gap: 12px; text-decoration: none; z-index: 1001; }
+        .brand-logo-img { width: 42px; height: 42px; object-fit: contain; border-radius: 50%; image-rendering: -webkit-optimize-contrast; border: 2px solid #ffffff; }
+        .logo { font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; text-decoration: none; color: #ffffff; }
+        .logo span { color: #ffe4e6; }
+        
+        /* NAV MENU */
+        .nav-menu { 
+            display: flex; 
+            align-items: center;
+            gap: 40px; 
+        }
+        .nav-menu a { 
+            color: #ffffff; 
+            text-decoration: none; 
+            font-size: 1.05rem; 
+            font-weight: 500; 
+            letter-spacing: 0.5px;
+            transition: 0.3s; 
+            opacity: 0.9;
+        }
+        .nav-menu a:hover, .nav-menu a.active { 
+            opacity: 1; 
+            font-weight: 700; 
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 28px;
+            height: 21px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 1001;
+            margin-left: auto;
+        }
+        .menu-toggle span { display: block; width: 100%; height: 3px; background-color: #ffffff; border-radius: 2px; transition: 0.3s; }
+
+        /* HERO BANNER SECTION */
+        .hero-banner {
+            position: relative;
+            width: 100%;
+            height: 55vh; 
+            min-height: 400px; 
+            max-height: 550px;
+            background-image: url('images/logo-icon.jpg'); 
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8%;
+        }
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(43, 11, 23, 0.45); 
+            z-index: 1;
+        }
+        .slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 2.5rem;
+            cursor: pointer;
+            z-index: 3;
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+        .slider-arrow:hover { opacity: 1; }
+        .slider-arrow.left { left: 3%; }
+        .slider-arrow.right { right: 3%; }
+
+        .hero-content { position: relative; z-index: 2; color: #ffffff; max-width: 700px; margin-left: 2%; }
+        .hero-content h1 { font-size: 4.5rem; font-weight: 800; line-height: 1.1; letter-spacing: 1px; text-transform: uppercase; }
+        
+        .hero-action { position: relative; z-index: 2; margin-right: 2%; }
+        .hero-btn { 
+            display: inline-block; 
+            border: 1px solid #ffffff; 
+            background: transparent; 
+            color: #ffffff; 
+            padding: 12px 35px; 
+            border-radius: 50px; 
+            font-size: 1rem; 
+            font-weight: 500; 
+            text-decoration: none; 
+            transition: all 0.3s ease; 
+        }
+        .hero-btn:hover { background: #ffffff; color: #ff1493; }
+
+        /* ABOUT STORY SECTION */
+        .story-container { max-width: 1250px; margin: 80px auto; padding: 0 5%; }
+        .story-layout { 
+            display: flex; 
+            align-items: center; 
+            gap: 60px; 
+            background: #ffffff; 
+            border: 1px solid #fbcfe8; 
+            border-radius: 24px; 
+            padding: 50px; 
+            box-shadow: 0 10px 30px rgba(255, 182, 193, 0.15); 
+        }
+        .story-text { flex: 1; text-align: left; }
+        .story-text h2 { font-size: 2.5rem; font-weight: 700; color: #2b4c7e; margin-bottom: 20px; }
+        .story-text p { color: #4b5563; font-size: 1.05rem; line-height: 1.8; margin-bottom: 25px; }
+        .read-more-btn { display: inline-block; background-color: #ff1493; color: #ffffff; padding: 12px 28px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(255, 20, 147, 0.3); transition: 0.3s; }
+        .read-more-btn:hover { background-color: #e00d7f; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4); }
+        
+        .story-image { flex: 1.5; position: relative; }
+        .story-image img { width: 100%; height: auto; aspect-ratio: 16/9; border-radius: 20px; object-fit: cover; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+
+        /* GALLERY SECTION */
+        .gallery-container { max-width: 1550px; margin: 0 auto; padding: 20px 4% 50px; text-align: center; }
+        .gallery-title { font-size: 2.2rem; font-weight: 700; margin-bottom: 12px; color: #2b4c7e; }
+        .gallery-title span { color: #ff1493; }
+        .gallery-subtitle { color: #4b5563; font-size: 1rem; margin-bottom: 45px; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .gallery-card { background: #ffffff; border: 1px solid #fbcfe8; border-radius: 16px; overflow: hidden; transition: all 0.3s ease; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .gallery-card:hover { transform: translateY(-5px); border-color: #ff1493; box-shadow: 0 10px 30px rgba(255, 20, 147, 0.15); }
+        .gallery-img-box { aspect-ratio: 4/5; background: #f9a8d4; display: flex; align-items: center; justify-content: center; color: #666; font-size: 0.85rem; overflow: hidden; }
+        .gallery-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .gallery-card:hover .gallery-img-box img { transform: scale(1.05); }
+        .gallery-info { padding: 18px 15px; text-align: center; }
+        .gallery-info h3 { font-size: 1rem; font-weight: 600; color: #2b4c7e; }
+
+        /* LATEST PROMO SECTION */
+        .promo-section { max-width: 1550px; margin: 0 auto 80px; padding: 0 4%; }
+        .promo-wrapper { background: #18171d; border: 1px solid rgba(255, 20, 147, 0.3); border-radius: 24px; padding: 50px 40px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); display: grid; grid-template-columns: 240px 1fr; gap: 40px; align-items: center; }
+        .promo-left h2 { color: #ffffff; font-size: 2.2rem; font-weight: 800; line-height: 1.2; letter-spacing: 1px; }
+        .promo-cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .promo-card-item { background: #201f26; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s ease; }
+        .promo-card-item:hover { transform: translateY(-5px); border-color: #ff1493; box-shadow: 0 10px 25px rgba(255, 20, 147, 0.2); }
+        .promo-card-img { aspect-ratio: 3/4; background: #111015; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .promo-card-img img { width: 100%; height: 100%; object-fit: cover; }
+        .promo-card-desc { padding: 18px 15px; text-align: center; }
+        .promo-card-desc h3 { color: #ffffff; font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+        .promo-card-desc p { color: #9ca3af; font-size: 0.8rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* INSTAGRAM & TIKTOK FEED SECTION */
+        .instagram-feed-section { max-width: 1550px; margin: 0 auto 80px; padding: 0 4%; text-align: center; }
+        .ig-header { margin-bottom: 30px; }
+        .ig-header h2 { font-size: 2rem; font-weight: 700; color: #2b4c7e; margin-bottom: 8px; }
+        .ig-header h2 span { color: #ff1493; }
+        .ig-header p { color: #4b5563; font-size: 0.95rem; }
+        .ig-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+        .ig-card { background: #000000; border: 1px solid #fbcfe8; border-radius: 16px; overflow: hidden; aspect-ratio: 9/16; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.3s ease; position: relative; display: flex; align-items: center; justify-content: center; }
+        .ig-card:hover { transform: translateY(-5px); border-color: #ff1493; box-shadow: 0 10px 25px rgba(255, 20, 147, 0.15); }
+        .ig-card video { width: 100%; height: 100%; object-fit: cover; }
+
+        /* FOOTER KONSISTEN */
+        footer { background-color: #18171d; color: #b5b5bc; padding: 60px 8% 30px; border-top: 2px solid #fbcfe8; margin-top: 40px; }
+        .footer-content { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; }
+        .footer-left h3 { color: #ffffff; font-size: 1.2rem; margin-bottom: 15px; }
+        .footer-left p, .footer-left address { font-style: normal; font-size: 0.95rem; line-height: 1.6; margin-bottom: 15px; color: #9ca3af; }
+        .footer-left a { color: #ff1493; text-decoration: none; transition: 0.3s; }
+        .footer-left a:hover { text-decoration: underline; }
+        .footer-helpdesk { margin-top: 25px; }
+        .footer-helpdesk h4 { color: #ffffff; font-size: 1rem; margin-bottom: 10px; }
+        .footer-helpdesk ul { list-style: none; }
+        .footer-helpdesk ul li { margin-bottom: 8px; }
+        .footer-helpdesk ul li a { color: #9ca3af; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .footer-helpdesk ul li a:hover { color: #ff1493; }
+
+        .footer-location-card { background: linear-gradient(145deg, #201f26 0%, #18171d 100%); border: 1px solid rgba(255, 20, 147, 0.3); border-radius: 20px; padding: 35px 30px; text-decoration: none; display: flex; flex-direction: column; align-items: center; text-align: center; transition: all 0.35s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .footer-location-card:hover { border-color: #ff1493; transform: translateY(-5px); box-shadow: 0 15px 35px rgba(255, 20, 147, 0.25); background: linear-gradient(145deg, #26242f 0%, #1c1b22 100%); }
+        .footer-location-card h4 { color: #ffffff; font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; }
+        .footer-location-card p { color: #9ca3af; font-size: 0.95rem; margin-bottom: 25px; line-height: 1.5; }
+        .location-btn-action { background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%); color: #ffffff; padding: 14px 32px; border-radius: 50px; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 20px rgba(255, 20, 147, 0.4); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 10px; }
+        .footer-location-card:hover .location-btn-action { transform: scale(1.05); box-shadow: 0 6px 25px rgba(255, 20, 147, 0.6); background: linear-gradient(135deg, #e00d7f 0%, #ff1493 100%); }
+        .footer-bottom { max-width: 1300px; margin: 40px auto 0; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center; font-size: 0.85rem; color: #6b7280; }
+
+        /* RESPONSIF LAYAR SEDANG & HP */
+        @media screen and (max-width: 1200px) {
+            .ig-grid { grid-template-columns: repeat(3, 1fr); }
+            .promo-wrapper { grid-template-columns: 1fr; text-align: center; }
+            .promo-cards-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media screen and (max-width: 900px) {
+            .ig-grid { grid-template-columns: repeat(2, 1fr); }
+            .promo-cards-grid { grid-template-columns: repeat(2, 1fr); }
+            .hero-content h1 { font-size: 3.5rem; }
+            .nav-menu { gap: 20px; }
+        }
+        @media screen and (max-width: 768px) {
+            .menu-toggle { display: flex; }
+            .nav-menu { position: fixed; top: 0; left: -100%; width: 260px; height: 100vh; background-color: #ffffff; flex-direction: column; padding: 90px 25px 25px 25px; box-shadow: 5px 0 25px rgba(0,0,0,0.1); transition: left 0.3s ease-in-out; border-right: 1px solid #fbcfe8; gap: 0; margin: 0; }
+            .nav-menu.active { left: 0; }
+            .nav-menu a { margin-left: 0; font-size: 1.05rem; padding: 14px 0; border-bottom: 1px solid #f3f4f6; width: 100%; color: #2b4c7e; opacity: 1; }
+            
+            .hero-banner { flex-direction: column; justify-content: center; text-align: center; min-height: 350px; height: auto; padding: 60px 5%; gap: 30px; }
+            .hero-content { margin-left: 0; }
+            .hero-content h1 { font-size: 2.5rem; }
+            .hero-action { margin-right: 0; }
+            .slider-arrow { display: none; }
+            
+            .story-layout { flex-direction: column; padding: 30px; text-align: center; gap: 30px; }
+            .story-text { text-align: center; }
+            .story-image { width: 100%; }
+
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .promo-cards-grid { grid-template-columns: 1fr; }
+            .footer-content { grid-template-columns: 1fr; gap: 30px; }
+        }
+        @media (max-width: 480px) {
+            .ig-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo-container">
+            <img src="images/logo-icon.jpg" alt="OH SNAP! Logo" class="brand-logo-img">
+            <span class="logo">OH SNAP<span>!</span></span>
+        </a>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Buka Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <nav class="nav-menu" id="navMenu">
+            <a href="index.html" class="active">Home</a>
+            <a href="layanan.html">Layanan</a>
+            <a href="frame.html">Frame</a>
+            <a href="lokasi.html">Lokasi</a>
+            <a href="resend.html">Resend Softcopy</a>
+            <a href="kontak.html">Kontak</a>
+        </nav>
+    </header>
+
+    <section class="hero-banner" id="heroBannerSection">
+        <div class="slider-arrow left">❮</div>
+        
+        <div class="hero-content">
+            <h1 id="heroTitleText">LANGSUNG CETAK<br>BAWA PULANG</h1>
+        </div>
+        <div class="hero-action">
+            <a href="lokasi.html" class="hero-btn">Check our locations!</a>
+        </div>
+
+        <div class="slider-arrow right">❯</div>
+    </section>
+
+    <div class="story-container">
+        <div class="story-layout">
+            <div class="story-text">
+                <h2 id="aboutTitleText">About Our Story</h2>
+                <p id="aboutDescText">Sekarang semuanya serba cepat — bangun pagi, kerja, ngurus ini itu, tiba-tiba udah malam lagi. Di tengah rutinitas yang padat, kami hadir menyediakan ruang kreatif untuk melepas penat sejenak, bersenang-senang, dan mengabadikan momen otentikmu dengan mudah.</p>
+                <a href="story.html" class="read-more-btn">Read More</a>
+            </div>
+            <div class="story-image">
+                <img src="images/logo-icon.jpg" alt="About Our Story" id="aboutStoryImgEl">
+            </div>
+        </div>
+    </div>
+
+    <div class="gallery-container">
+        <h2 class="gallery-title" id="studioTitleHeader">Hasil Foto & Suasana <span>Studio</span></h2>
+        <p class="gallery-subtitle" id="studioSubHeader">Intip pengalaman seru dan hasil jepretan pelanggan kami</p>
+
+        <div class="gallery-grid" id="studioGalleryGrid">
+            <!-- 4 Kolom Studio yang otomatis terisi dari admin -->
+            <script>
+                for(let i=1; i<=4; i++) {
+                    document.write(`
+                        <div class="gallery-card">
+                            <div class="gallery-img-box"><img id="studioImgEl${i}" src="images/placeholder.txt" alt="Studio ${i}"></div>
+                            <div class="gallery-info"><h3 id="studioTitleEl${i}">Studio Foto ${i}</h3></div>
+                        </div>
+                    `);
+                }
+            </script>
+        </div>
+    </div>
+
+    <div class="promo-section">
+        <div class="promo-wrapper">
+            <div class="promo-left">
+                <h2>CHECK<br>OUR<br>LATEST<br>PROMO!</h2>
+            </div>
+            <div class="promo-cards-grid" id="promoCardsGrid">
+                <!-- 3 Kolom Promo yang otomatis terisi dari admin -->
+                <script>
+                    for(let i=1; i<=3; i++) {
+                        document.write(`
+                            <div class="promo-card-item">
+                                <div class="promo-card-img"><img id="promoImgEl${i}" src="images/placeholder.txt" alt="Promo ${i}"></div>
+                                <div class="promo-card-desc">
+                                    <h3 id="promoTitleEl${i}">Promo ${i}</h3>
+                                    <p id="promoDescEl${i}">Deskripsi promo eksklusif OH SNAP!</p>
+                                </div>
+                            </div>
+                        `);
+                    }
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <div class="instagram-feed-section">
+        <div class="ig-header">
+            <h2>Instagram & TikTok <span>Feed</span></h2>
+            <p>Ikuti keseruan kami di <a href="https://www.instagram.com/ohsnap_photobox" target="_blank" style="color: #ff1493; text-decoration: none; font-weight: 600;">@ohsnap_photobox</a></p>
+        </div>
+        <div class="ig-grid" id="videoFeedGrid">
+            <!-- 5 Kolom Video Feed dengan Controls (Suara Nyala & Play/Pause Manual) -->
+            <script>
+                for(let i=1; i<=5; i++) {
+                    document.write(`
+                        <div class="ig-card">
+                            <video id="videoFeedEl${i}" src="" controls preload="metadata" playsinline></video>
+                        </div>
+                    `);
+                }
+            </script>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                <h3>OH SNAP! Photobox Group</h3>
+                <address><strong>Cabang:</strong> Kediri Mall Lt.5, Plaza Cilacap Lt.3, Laksana Baru Lt.3, Plaza Pekalongan Lt.2, Yogya Pemalang Lt.3</address>
+                <p>Instagram: <a href="https://www.instagram.com/ohsnap_photobox" target="_blank">@ohsnap_photobox</a></p>
+                <p>TikTok: <a href="https://www.tiktok.com/@ohsnap_photobox" target="_blank">@ohsnap_photobox</a></p>
+                <div class="footer-helpdesk">
+                    <h4>Helpdesk</h4>
+                    <ul><li><a href="resend.html">Resend Softcopy</a></li></ul>
+                </div>
+            </div>
+            <a href="lokasi.html" class="footer-location-card">
+                <h4>Find nearby OH SNAP! Studio</h4>
+                <p>Temukan booth dan studio terdekat di kotamu!</p>
+                <div class="location-btn-action"><span>📍 Temukan Semua Lokasi</span></div>
+            </a>
+        </div>
+        <div class="footer-bottom"><p>&copy; 2026 OH SNAP! Photobox. All rights reserved.</p></div>
+    </footer>
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+        menuToggle.addEventListener('click', () => { navMenu.classList.toggle('active'); });
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => { navMenu.classList.remove('active'); });
+        });
+
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyum2HVg2InZDhEyeata3I2hTbPUQzzqyKHsEtgA9Z3vRCF2CeTjwzGTCHd4tszlOMm/exec";
+
+        async function loadHomepageContent() {
+            try {
+                // Parameter ?t=... mencegah cache browser agar data update langsung tampil
+                const response = await fetch(APPS_SCRIPT_URL + "?t=" + new Date().getTime());
+                if (!response.ok) return;
+
+                const data = await response.json();
+                
+                if (data && data.homepage) {
+                    const c = data.homepage;
+
+                    // 1. Hero & Banner
+                    if (c.heroTitle) document.getElementById('heroTitleText').innerHTML = c.heroTitle;
+                    if (c.heroBannerImg) document.getElementById('heroBannerSection').style.backgroundImage = `url('${c.heroBannerImg}')`;
+
+                    // 2. About Our Story
+                    if (c.aboutTitle) document.getElementById('aboutTitleText').textContent = c.aboutTitle;
+                    if (c.aboutDesc) document.getElementById('aboutDescText').textContent = c.aboutDesc;
+                    if (c.aboutStoryImg) document.getElementById('aboutStoryImgEl').src = c.aboutStoryImg;
+
+                    // 3. Suasana Studio (4 Kolom)
+                    for (let i = 1; i <= 4; i++) {
+                        if (c['studioTitle' + i]) document.getElementById('studioTitleEl' + i).textContent = c['studioTitle' + i];
+                        if (c['studioImg' + i]) document.getElementById('studioImgEl' + i).src = c['studioImg' + i];
+                    }
+
+                    // 4. Promo (3 Kolom)
+                    for (let i = 1; i <= 3; i++) {
+                        if (c['promoTitle' + i]) document.getElementById('promoTitleEl' + i).textContent = c['promoTitle' + i];
+                        if (c['promoDesc' + i]) document.getElementById('promoDescEl' + i).textContent = c['promoDesc' + i];
+                        if (c['promoImg' + i]) document.getElementById('promoImgEl' + i).src = c['promoImg' + i];
+                    }
+
+                    // 5. Video Feed (Tanpa autoplay agar bisa diklik manual & suara aktif)
+                    for (let i = 1; i <= 5; i++) {
+                        const videoEl = document.getElementById('videoFeedEl' + i);
+                        if (videoEl && c['videoFeed' + i]) {
+                            videoEl.src = c['videoFeed' + i];
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log("Menggunakan konten default website.");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadHomepageContent);
+    </script>
+</body>
+</html>
