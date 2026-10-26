@@ -65,6 +65,7 @@
             z-index: 1001;
             margin-left: auto;
         }
+        /* Ikon hamburger dipastikan berwarna putih bersih */
         .menu-toggle span { display: block; width: 100%; height: 3px; background-color: #ffffff; border-radius: 2px; transition: 0.3s; }
 
         /* HERO BANNER SECTION */
@@ -217,7 +218,7 @@
         }
         @media screen and (max-width: 768px) {
             .menu-toggle { display: flex; }
-            /* Perubahan background slide hamburger menjadi pink (#ef4444) dan teks menu putih */
+            /* Slide background pink (#ef4444) dan teks putih agar terlihat jelas */
             .nav-menu { position: fixed; top: 0; left: -100%; width: 260px; height: 100vh; background-color: #ef4444; flex-direction: column; padding: 90px 25px 25px 25px; box-shadow: 5px 0 25px rgba(0,0,0,0.1); transition: left 0.3s ease-in-out; border-right: 1px solid #dc2626; gap: 0; margin: 0; }
             .nav-menu.active { left: 0; }
             .nav-menu a { margin-left: 0; font-size: 1.05rem; padding: 14px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); width: 100%; color: #ffffff; opacity: 0.9; }
@@ -340,7 +341,7 @@
             <p>Ikuti keseruan kami di <a href="https://www.instagram.com/ohsnap_photobox" target="_blank" style="color: #ff1493; text-decoration: none; font-weight: 600;">@ohsnap_photobox</a></p>
         </div>
         <div class="ig-grid" id="videoFeedGrid">
-            <!-- 5 Kolom Video Feed dengan Controls (Suara Nyala & Play/Pause Manual) -->
+            <!-- 5 Kolom Video Feed dengan Controls & Auto-Pause -->
             <script>
                 for(let i=1; i<=5; i++) {
                     document.write(`
@@ -439,7 +440,7 @@
                         });
                     });
                 });
-            }, 1000); // Diberi jeda agar elemen video dari dynamic load siap
+            }, 1000);
         });
     </script>
 </body>
