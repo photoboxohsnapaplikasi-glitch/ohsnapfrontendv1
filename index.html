@@ -217,11 +217,12 @@
         }
         @media screen and (max-width: 768px) {
             .menu-toggle { display: flex; }
-            /* Disamakan persis dengan halaman lain: Background putih bersih (#ffffff) dan teks warna gelap (#2b4c7e) */
             .nav-menu { position: fixed; top: 0; left: -100%; width: 260px; height: 100vh; background-color: #ffffff; flex-direction: column; padding: 90px 25px 25px 25px; box-shadow: 5px 0 25px rgba(0,0,0,0.1); transition: left 0.3s ease-in-out; border-right: 1px solid #fbcfe8; gap: 0; margin: 0; }
             .nav-menu.active { left: 0; }
-            .nav-menu a { margin-left: 0; font-size: 1.05rem; padding: 14px 0; border-bottom: 1px solid #f3f4f6; width: 100%; color: #2b4c7e; opacity: 1; }
-            .nav-menu a:hover, .nav-menu a.active { color: #ff1493; font-weight: 700; }
+            .nav-menu a { margin-left: 0; font-size: 1.05rem; padding: 14px 0; border-bottom: 1px solid #f3f4f6; width: 100%; color: #2b4c7e; opacity: 1; font-weight: 500; }
+            /* Menu aktif tetap biru tua khas logo namun menjadi tebal (*bold*) */
+            .nav-menu a.active { color: #2b4c7e !important; font-weight: 700; }
+            .nav-menu a:hover { color: #2b4c7e; font-weight: 700; }
             
             .hero-banner { flex-direction: column; justify-content: center; text-align: center; min-height: 350px; height: auto; padding: 60px 5%; gap: 30px; }
             .hero-content { margin-left: 0; }
